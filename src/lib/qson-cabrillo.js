@@ -14,7 +14,6 @@ const CABRILLO_MODES_TO_QSON_MODES = {
   CW: "CW",
   PH: "SSB",
   FM: "FM",
-  DG: "DIGI",
 }
 
 function parseCabrillo(str) {
@@ -60,12 +59,16 @@ function parseCabrillo(str) {
     }
   })
 
+  const refs = [contestReferenceInfo(headers)]
+
+  qsos.forEach((qso) => (qso.refs = refs))
+
   qsos.sort((a, b) => a.startMillis - b.startMillis)
 
   return {
     source: "cabrillo",
-    rawCabrillo: headers,
-    refs: [normalizeContestInfo(headers)],
+    rawHeaders: headers,
+    common: { refs },
     qsos,
     qsosOther,
   }
@@ -77,9 +80,6 @@ function parseCabrilloQSO(parts, headers, cache) {
   const qso = cache.contestSplitter(parts)
 
   qso.freq = parseFrequency(parts[0])
-  if (qso.freq == 50) {
-    console.log(qso)
-  }
   qso.band = bandForFrequency(qso.freq)
   qso.mode = CABRILLO_MODES_TO_QSON_MODES[parts[1]] || parts[1]
   qso.start = `${parts[2]}T${parts[3].substring(0, 2)}:${parts[3].substring(2, 4)}:00Z`
@@ -100,26 +100,29 @@ function parseFrequency(freq) {
 
 const REGEXP_FOR_OPERATOR_LIST = /(,\s*|\s+)/
 
-function normalizeContestInfo(headers) {
-  const info = { category: {} }
-  info.contest = headers.contest
-  if (headers.callsign) info.call = headers.callsign
-  if (headers.club) info.club = headers.club
-  if (headers.operators) info.operators = headers.operators.split(REGEXP_FOR_OPERATOR_LIST)
-  if (headers.location) info.location = headers.location
-  if (headers.gridLocator) info.grid = headers.gridLocator
-  if (headers.claimedScore) info.claimedScore = headers.claimedScore
+function contestReferenceInfo(headers) {
+  const ref = {}
 
-  if (headers.categoryAssisted) info.categoryAssisted = headers.categoryAssisted
-  if (headers.categoryBand) info.categoryBand = headers.categoryBand
-  if (headers.categoryMode) info.categoryMode = headers.categoryMode
-  if (headers.categoryOperator) info.categoryOperator = headers.categoryOperator
-  if (headers.categoryMode) info.categoryMode = headers.categoryMode
-  if (headers.categoryOverlay) info.categoryOverlay = headers.categoryOverlay
-  if (headers.categoryStation) info.categoryStation = headers.categoryStation
-  if (headers.categoryTransmitter) info.categoryTransmitter = headers.categoryTransmitter
+  ref.type = "contest"
+  ref.ref = headers.contest
 
-  return info
+  if (headers.callsign) ref.call = headers.callsign
+  if (headers.club) ref.club = headers.club
+  if (headers.operators) ref.operators = headers.operators.split(REGEXP_FOR_OPERATOR_LIST)
+  if (headers.location) ref.location = headers.location
+  if (headers.gridLocator) ref.grid = headers.gridLocator
+  if (headers.claimedScore) ref.claimedScore = headers.claimedScore
+
+  if (headers.categoryAssisted) ref.categoryAssisted = headers.categoryAssisted
+  if (headers.categoryBand) ref.categoryBand = headers.categoryBand
+  if (headers.categoryMode) ref.categoryMode = headers.categoryMode
+  if (headers.categoryOperator) ref.categoryOperator = headers.categoryOperator
+  if (headers.categoryMode) ref.categoryMode = headers.categoryMode
+  if (headers.categoryOverlay) ref.categoryOverlay = headers.categoryOverlay
+  if (headers.categoryStation) ref.categoryStation = headers.categoryStation
+  if (headers.categoryTransmitter) ref.categoryTransmitter = headers.categoryTransmitter
+
+  return ref
 }
 
 function selectContestSplitter(headers) {
@@ -157,7 +160,7 @@ function selectContestSplitter(headers) {
 
   return (parts) => {
     const len = fields.length
-    const qso = { our: {}, their: {} }
+    const qso = { our: {}, their: {}, source: "cabrillo" }
     qso.our.call = parts[4]
     qso.their.call = parts[4 + len + 1]
     qso.our.sent = {}
@@ -178,6 +181,7 @@ function selectContestSplitter(headers) {
     if (fields.length % 2 === 0) {
       qso.our.transmitter = Number.parseInt(parts[parts.length - 1])
     }
+
     return qso
   }
 }
