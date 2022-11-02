@@ -1,5 +1,5 @@
 {
-  "root": "libs/qson/cabrillo",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/qson/cabrillo/src",
   "projectType": "library",
   "targets": {
@@ -22,9 +22,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/qson/cabrillo"],
+      "outputs": ["{workspaceRoot}/coverage/libs/qson/cabrillo"],
       "options": {
-        "jestConfig": "libs/qson/cabrillo/jest.config.js",
+        "jestConfig": "libs/qson/cabrillo/jest.config.ts",
         "passWithNoTests": true
       }
     }

@@ -1,4 +1,5 @@
-module.exports = {
+/* eslint-disable */
+export default {
   displayName: "qson-cabrillo",
   preset: "../../../jest.preset.js",
   globals: {
