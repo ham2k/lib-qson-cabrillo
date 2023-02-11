@@ -1,5 +1,5 @@
 const camelCase = require("camelcase")
-const { bandForFrequency } = require("@ham2k/data/operation")
+const { bandForFrequency } = require("@ham2k/data-operation")
 
 function cabrilloToQSON(str) {
   return parseCabrillo(str)
