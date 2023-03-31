@@ -1,5 +1,5 @@
 {
-  "name": "@ham2k/qson-cabrillo",
+  "name": "qson-cabrillo",
   "version": "0.0.1",
   "dependencies": {
     "camelcase": "^6.3.0"
