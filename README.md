@@ -1,11 +1,3 @@
-# qson-cabrillo
+# lib-qson-cabrillo
 
-This library was generated with [Nx](https://nx.dev).
-
-## Building
-
-Run `nx build qson-cabrillo` to build the library.
-
-## Running unit tests
-
-Run `nx test qson-cabrillo` to execute the unit tests via [Jest](https://jestjs.io).
+A JavaScript library to load Cabrillo log files and convert them to QSON: A standard notation for Amateur Radio QSO Information

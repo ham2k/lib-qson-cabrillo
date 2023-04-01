@@ -1,7 +1,7 @@
-const camelCase = require("camelcase")
-const { bandForFrequency } = require("@ham2k/data/operation")
+const camelCase = require('camelcase')
+const { bandForFrequency } = require('@ham2k/lib-operation-data')
 
-function cabrilloToQSON(str) {
+function cabrilloToQSON (str) {
   return parseCabrillo(str)
 }
 
@@ -10,19 +10,19 @@ const REGEXP_FOR_LINE_TAG = /^([A-Z-]+):\s*(.*)\s*$/
 const REGEXP_FOR_LINE_PARTS = /\s+/
 
 const CABRILLO_MODES_TO_QSON_MODES = {
-  RY: "RTTY",
-  CW: "CW",
-  PH: "SSB",
-  FM: "FM",
+  RY: 'RTTY',
+  CW: 'CW',
+  PH: 'SSB',
+  FM: 'FM'
 }
 
-function parseCabrillo(str) {
+function parseCabrillo (str) {
   const cache = {}
   const headers = {}
   const qsos = []
   const qsosOther = []
 
-  var qsoCount = 0
+  let qsoCount = 0
 
   const lines = str.split(REGEXP_FOR_END_OF_LINE)
   lines.forEach((line, i) => {
@@ -32,24 +32,24 @@ function parseCabrillo(str) {
       const tag = camelCase(matches[1])
       const data = matches[2]
 
-      if (tag === "qso") {
+      if (tag === 'qso') {
         const qso = parseCabrilloQSO(data.split(REGEXP_FOR_LINE_PARTS), headers, cache)
         qsoCount++
         qso.number = qsoCount
         qso.line = i + 1
         qsos.push(qso)
-      } else if (tag === "xQso") {
+      } else if (tag === 'xQso') {
         const qso = parseCabrilloQSO(data.split(REGEXP_FOR_LINE_PARTS), headers, cache)
         qsoCount++
         qso.number = qsoCount
         qso.line = i + 1
         qsosOther.push(qso)
       } else {
-        if (tag === "startOfLog") {
-          headers["version"] = data
-        } else if (tag === "endOfLog") {
+        if (tag === 'startOfLog') {
+          headers.version = data
+        } else if (tag === 'endOfLog') {
           // Do nothing
-        } else if (tag === "soapbox" || tag === "address") {
+        } else if (tag === 'soapbox' || tag === 'address') {
           headers[tag] = headers[tag] || []
           headers[tag].push(data)
         } else {
@@ -66,15 +66,15 @@ function parseCabrillo(str) {
   qsos.sort((a, b) => a.startMillis - b.startMillis)
 
   return {
-    source: "cabrillo",
+    source: 'cabrillo',
     rawHeaders: headers,
     common: { refs },
     qsos,
-    qsosOther,
+    qsosOther
   }
 }
 
-function parseCabrilloQSO(parts, headers, cache) {
+function parseCabrilloQSO (parts, headers, cache) {
   if (cache.contestSplitter === undefined) cache.contestSplitter = selectContestSplitter(headers)
 
   const qso = cache.contestSplitter(parts)
@@ -93,17 +93,17 @@ function parseCabrilloQSO(parts, headers, cache) {
 
 const REGEXP_FOR_NUMERIC_FREQUENCY = /^\d+$/
 
-function parseFrequency(freq) {
+function parseFrequency (freq) {
   if (freq.match(REGEXP_FOR_NUMERIC_FREQUENCY)) return Number.parseInt(freq)
   else return freq
 }
 
 const REGEXP_FOR_OPERATOR_LIST = /(,\s*|\s+)/
 
-function contestReferenceInfo(headers) {
+function contestReferenceInfo (headers) {
   const ref = {}
 
-  ref.type = "contest"
+  ref.type = 'contest'
   ref.ref = headers.contest
 
   if (headers.callsign) ref.call = headers.callsign
@@ -125,42 +125,42 @@ function contestReferenceInfo(headers) {
   return ref
 }
 
-function selectContestSplitter(headers) {
-  const contest = headers.contest || "unknown"
+function selectContestSplitter (headers) {
+  const contest = headers.contest || 'unknown'
   const isNumeric = { serial: true, check: true, cqZone: true, ituZone: true }
   let fields = []
 
   if (contest.match(/^CQ-WPX-|DARC-WAEDC-|RSGB-AFS-|RSGB-NFD|RGSB-SSB|RSGB-80/)) {
-    fields = ["rst", "serial"]
+    fields = ['rst', 'serial']
   } else if (contest.match(/^RSGB-160-|RSGB-COMM|RSGB-IOTA|RSGB-LOW/)) {
-    fields = ["rst", "serial", "location"]
+    fields = ['rst', 'serial', 'location']
   } else if (contest.match(/^ARRL-FD|ARRL-FIELD-DAY|WFD/)) {
-    fields = ["class", "section"]
+    fields = ['class', 'section']
   } else if (contest.match(/^NAQP-/)) {
-    fields = ["name", "location"]
+    fields = ['name', 'location']
   } else if (contest.match(/QSO-PARTY/)) {
-    fields = ["rst", "location"]
+    fields = ['rst', 'location']
   } else if (contest.match(/^CQ-VHF-/)) {
-    fields = ["rst", "grid"]
+    fields = ['rst', 'grid']
   } else if (contest.match(/^ARRL-DX-/)) {
-    fields = ["rst", "sectionOrPower"]
+    fields = ['rst', 'sectionOrPower']
   } else if (contest.match(/^ARRL-160-/)) {
-    fields = ["rst", "section"]
+    fields = ['rst', 'section']
   } else if (contest.match(/^ARRL-VHF-/)) {
-    fields = ["grid"]
+    fields = ['grid']
   } else if (contest.match(/^ARRL-SS-/)) {
-    fields = ["serial", "prec", "check", "section"]
+    fields = ['serial', 'prec', 'check', 'section']
   } else if (contest.match(/^CQ-WW-/)) {
-    fields = ["rst", "cqZone"]
+    fields = ['rst', 'cqZone']
   } else if (contest.match(/^IARU-HF/)) {
-    fields = ["rst", "zoneOrHQ"]
+    fields = ['rst', 'zoneOrHQ']
   } else {
-    fields = ["rst", "exchange"]
+    fields = ['rst', 'exchange']
   }
 
   return (parts) => {
     const len = fields.length
-    const qso = { our: {}, their: {}, source: "cabrillo" }
+    const qso = { our: {}, their: {}, source: 'cabrillo' }
     qso.our.call = parts[4]
     qso.their.call = parts[4 + len + 1]
     qso.our.sent = {}
@@ -187,5 +187,5 @@ function selectContestSplitter(headers) {
 }
 
 module.exports = {
-  cabrilloToQSON,
+  cabrilloToQSON
 }
