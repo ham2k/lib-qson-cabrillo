@@ -1,6 +1,6 @@
 {
   "name": "@ham2k/lib-qson-cabrillo",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "type": "commonjs",
   "dependencies": {
     "camelcase": "^6.3.0",

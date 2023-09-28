@@ -35,14 +35,14 @@ function parseCabrillo (str) {
       if (tag === 'qso') {
         const qso = parseCabrilloQSO(data.split(REGEXP_FOR_LINE_PARTS), headers, cache)
         qsoCount++
-        qso.number = qsoCount
-        qso.line = i + 1
+        qso._number = qsoCount
+        qso._line = i + 1
         qsos.push(qso)
       } else if (tag === 'xQso') {
         const qso = parseCabrilloQSO(data.split(REGEXP_FOR_LINE_PARTS), headers, cache)
         qsoCount++
-        qso.number = qsoCount
-        qso.line = i + 1
+        qso._number = qsoCount
+        qso._line = i + 1
         qsosOther.push(qso)
       } else {
         if (tag === 'startOfLog') {
@@ -59,16 +59,15 @@ function parseCabrillo (str) {
     }
   })
 
-  const refs = [contestReferenceInfo(headers)]
+  const ref = contestReferenceInfo(headers)
 
-  qsos.forEach((qso) => (qso.refs = refs))
+  qsos.forEach((qso) => (qso.refs = { contest: ref }))
 
   qsos.sort((a, b) => a.startMillis - b.startMillis)
 
   return {
     source: 'cabrillo',
     rawHeaders: headers,
-    common: { refs },
     qsos,
     qsosOther
   }
@@ -82,8 +81,8 @@ function parseCabrilloQSO (parts, headers, cache) {
   qso.freq = parseFrequency(parts[0])
   qso.band = bandForFrequency(qso.freq)
   qso.mode = CABRILLO_MODES_TO_QSON_MODES[parts[1]] ?? parts[1]
-  qso.start = `${parts[2]}T${parts[3].substring(0, 2)}:${parts[3].substring(2, 4)}:00Z`
-  qso.startMillis = Date.parse(qso.start).valueOf()
+  qso.startOn = `${parts[2]}T${parts[3].substring(0, 2)}:${parts[3].substring(2, 4)}:00Z`
+  qso.startOnMillis = Date.parse(qso.startOn).valueOf()
   if (cache.hasTransmitterId) {
     qso.our.transmitter = parts[parts.length - 1]
   }
@@ -103,7 +102,6 @@ const REGEXP_FOR_OPERATOR_LIST = /(,\s*|\s+)/
 function contestReferenceInfo (headers) {
   const ref = {}
 
-  ref.type = 'contest'
   ref.ref = headers.contest
 
   if (headers.callsign) ref.call = headers.callsign

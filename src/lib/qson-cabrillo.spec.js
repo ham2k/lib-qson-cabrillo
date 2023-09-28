@@ -9,8 +9,8 @@ describe('cabrilloToQSON', () => {
 
     const qson = cabrilloToQSON(iaru)
     expect(qson.qsos.length).toEqual(518)
-    expect(qson.qsos[0].start).toEqual('2021-07-10T12:07:00Z')
-    expect(qson.qsos[0].startMillis).toEqual(Date.parse('2021-07-10T12:07:00Z'))
+    expect(qson.qsos[0].startOn).toEqual('2021-07-10T12:07:00Z')
+    expect(qson.qsos[0].startOnMillis).toEqual(Date.parse('2021-07-10T12:07:00Z'))
     expect(qson.qsos[0].freq).toEqual(7002)
     expect(qson.qsos[0].band).toEqual('40m')
     expect(qson.qsos[0].mode).toEqual('CW')
@@ -20,8 +20,8 @@ describe('cabrilloToQSON', () => {
     expect(qson.qsos[0].their.call).toEqual('VE3MGY')
     expect(qson.qsos[0].their.rst).toEqual('599')
     expect(qson.qsos[0].their.zoneOrHQ).toEqual('04')
-    expect(qson.qsos[0].refs[0].ref).toEqual('IARU-HF')
-    expect(qson.common.refs[0].ref).toEqual('IARU-HF')
+    expect(qson.qsos[0].refs.contest.ref).toEqual('IARU-HF')
+    expect(qson.qsos[0].refs.contest.categoryBand).toEqual('ALL')
   })
 
   it('should work with non 599 exchanges', () => {
@@ -30,8 +30,8 @@ describe('cabrilloToQSON', () => {
 
     const qson = cabrilloToQSON(rtty)
     expect(qson.qsos.length).toEqual(360)
-    expect(qson.qsos[0].start).toEqual('2022-02-26T18:01:00Z')
-    expect(qson.qsos[0].startMillis).toEqual(Date.parse('2022-02-26T18:01:00Z'))
+    expect(qson.qsos[0].startOn).toEqual('2022-02-26T18:01:00Z')
+    expect(qson.qsos[0].startOnMillis).toEqual(Date.parse('2022-02-26T18:01:00Z'))
     expect(qson.qsos[0].freq).toEqual(14087)
     expect(qson.qsos[0].band).toEqual('20m')
     expect(qson.qsos[0].mode).toEqual('RTTY')
@@ -41,8 +41,7 @@ describe('cabrilloToQSON', () => {
     expect(qson.qsos[0].their.call).toEqual('NJ4P')
     expect(qson.qsos[0].their.name).toEqual('ACE')
     expect(qson.qsos[0].their.location).toEqual('TN')
-    expect(qson.qsos[0].refs[0].ref).toEqual('NAQP-RTTY')
-    expect(qson.common.refs[0].ref).toEqual('NAQP-RTTY')
+    expect(qson.qsos[0].refs.contest.ref).toEqual('NAQP-RTTY')
   })
 
   it('should work with longer exchanges', () => {
@@ -51,8 +50,8 @@ describe('cabrilloToQSON', () => {
 
     const qson = cabrilloToQSON(sweeps)
     expect(qson.qsos.length).toEqual(499)
-    expect(qson.qsos[0].start).toEqual('2021-11-20T21:03:00Z')
-    expect(qson.qsos[0].startMillis).toEqual(Date.parse('2021-11-20T21:03:00Z'))
+    expect(qson.qsos[0].startOn).toEqual('2021-11-20T21:03:00Z')
+    expect(qson.qsos[0].startOnMillis).toEqual(Date.parse('2021-11-20T21:03:00Z'))
     expect(qson.qsos[0].freq).toEqual(14329)
     expect(qson.qsos[0].band).toEqual('20m')
     expect(qson.qsos[0].mode).toEqual('SSB')
@@ -66,7 +65,6 @@ describe('cabrilloToQSON', () => {
     expect(qson.qsos[0].their.prec).toEqual('U')
     expect(qson.qsos[0].their.check).toEqual(61)
     expect(qson.qsos[0].their.section).toEqual('NE')
-    expect(qson.qsos[0].refs[0].ref).toEqual('ARRL-SS-SSB')
-    expect(qson.common.refs[0].ref).toEqual('ARRL-SS-SSB')
+    expect(qson.qsos[0].refs.contest.ref).toEqual('ARRL-SS-SSB')
   })
 })
