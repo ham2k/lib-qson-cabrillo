@@ -1,3 +1,4 @@
-# lib-qson-cabrillo
+# This repository has been moved
 
-A JavaScript library to load Cabrillo log files and convert them to QSON: A standard notation for Amateur Radio QSO Information
+It now located at https://github.com/ham2k/ham-js-libs/tree/main/packages/lib-qson-cabrillo
+
